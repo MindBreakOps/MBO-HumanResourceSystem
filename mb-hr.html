@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mind Break HR</title>
+	<link rel="manifest" href="manifest.json">
+	<meta name="theme-color" content="#3d2b1f">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+	<style>
+		body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; }
+		.cafe-brown { background-color: #3d2b1f; }
+		.logo-frame {
+			background-color: #3d2b1f; padding: 15px; border: 4px solid #251a13;
+			border-radius: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+		}
+		.card { background: white; border-radius: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+		.btn-active:active { transform: scale(0.95); }
+		@keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+		.active-radar { animation: pulse-green 2s infinite; }
+	</style>
+</head>
+<body class="pb-10">
+
+	<div class="flex flex-col items-center py-10">
+		<div class="logo-frame">
+			<img src="mind.png" alt="Logo" class="h-24 w-auto">
+		</div>
+		<h1 class="mt-4 font-black text-[#3d2b1f] text-2xl tracking-tighter">MBO Human Resource System</h1>
+	</div>
+
+	<div id="login-section" class="max-w-md mx-auto px-6">
+		<div class="card p-8 border-t-8 border-[#3d2b1f]">
+			<h2 class="text-center font-bold mb-6 text-gray-700">تسجيل دخول الموظفين</h2>
+			<input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full p-4 mb-4 border rounded-2xl text-right outline-none">
+			<input type="password" id="password" placeholder="كلمة المرور" class="w-full p-4 mb-6 border rounded-2xl text-right outline-none">
+			<button onclick="login()" id="loginBtn" class="w-full cafe-brown text-white py-4 rounded-2xl font-bold shadow-lg btn-active transition-all">دخول النظام</button>
+		</div>
+	</div>
+
+	<div id="dashboard" class="hidden max-w-2xl mx-auto px-4 space-y-6">
+		<div class="card p-6 flex justify-between items-center bg-[#3d2b1f] text-white">
+			<div id="u-info" class="text-right"></div>
+			<button onclick="location.reload()" class="text-xs bg-red-600/30 border border-red-500 px-4 py-2 rounded-xl font-bold">خروج</button>
+		</div>
+
+		<div class="card p-6 text-center relative overflow-hidden">
+			<div class="absolute top-0 left-0 w-full h-1 bg-gray-100">
+				<div id="distance-bar" class="h-full bg-gray-300 transition-all duration-700 w-0"></div>
+			</div>
+			<h3 class="font-bold mb-6 text-gray-700">التحقق الذكي من الموقع</h3>
+			<div class="flex flex-col items-center mb-6">
+				<div id="radar-core" class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center transition-all duration-500 shadow-inner">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+					</svg>
+				</div>
+				<div id="distance-text" class="mt-4 text-3xl font-black text-[#3d2b1f]">-- متر</div>
+				<div id="accuracy-text" class="text-[10px] text-gray-400">جاري طلب إذن الوصول للـ GPS...</div>
+			</div>
+			<div id="status-msg" class="mb-4 p-4 rounded-2xl text-sm font-bold bg-gray-50 border-2 border-dashed">يرجى السماح بالوصول للموقع</div>
+			<button onclick="openExternalMap()" class="text-[10px] text-blue-500 font-bold underline mb-6 block w-full">تأكد من موقعك على خرائط Google ↗</button>
+			<div class="grid grid-cols-2 gap-4">
+				<button id="inBtn" onclick="record('حضور')" disabled class="bg-green-600 text-white py-6 rounded-3xl font-bold text-xl opacity-40 shadow-lg btn-active transition-all">حضور</button>
+				<button id="outBtn" onclick="record('انصراف')" disabled class="bg-red-600 text-white py-6 rounded-3xl font-bold text-xl opacity-40 shadow-lg btn-active transition-all">انصراف</button>
+			</div>
+		</div>
+
+		<div class="card p-6">
+			<h3 class="font-bold mb-4 text-gray-700">تقديم طلب أو إجازة</h3>
+			<select id="reqType" class="w-full p-4 mb-4 bg-gray-50 border rounded-2xl text-right outline-none">
+				<option value="استئذان">استئذان</option>
+				<option value="إجازة">طلب إجازة</option>
+				<option value="شكوى">شكوى أو اقتراح</option>
+			</select>
+			<textarea id="reqDetails" placeholder="اكتب التفاصيل هنا..." class="w-full p-4 mb-4 border rounded-2xl text-right h-24 outline-none"></textarea>
+			<div class="p-4 bg-orange-50 rounded-2xl mb-4 border border-orange-100">
+				<label class="block text-xs font-bold text-orange-900 mb-2">إرفاق صورة (اختياري):</label>
+				<input type="file" id="fileInput" accept="image/*" class="w-full text-xs text-gray-500">
+			</div>
+			<button onclick="sendRequest()" id="reqBtn" class="w-full bg-gray-800 text-white py-4 rounded-2xl font-bold shadow-md btn-active">إرسال للمدير</button>
+		</div>
+
+		<div id="admin-panel" class="hidden card p-6 border-2 border-orange-200 shadow-xl overflow-hidden">
+			<h3 class="font-bold text-orange-900 mb-6 flex items-center">📋 طلبات الموظفين المعلقة</h3>
+			<div class="overflow-x-auto">
+				<table class="w-full text-right text-sm">
+					<thead><tr class="text-gray-400 border-b"><th class="p-2">الموظف</th><th class="p-2">الطلب</th><th class="p-2 text-center">الإجراء</th></tr></thead>
+					<tbody id="admin-table"></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz34WWbbswac1O6vJaae-rNsRqQZLtObz6e3eFEmx5x3iij9GCz0Hp7fV6wONe-BMAx/exec";
+		const CAFE_LAT = 24.7694973; 
+		const CAFE_LNG = 46.7625231;
+		const RADIUS = 150; 
+		let user = null, myCoords = "", myDist = 9999;
+
+		// دالة تسجيل الدخول المطورة (تعمل بـ GET لتفادي مشاكل CORS)
+		async function login() {
+			const email = document.getElementById('email').value.trim();
+			const pass = document.getElementById('password').value.trim();
+			const btn = document.getElementById('loginBtn');
+			
+			if (!email || !pass) return alert("يرجى إدخال البيانات");
+			btn.innerText = "جاري التحقق...";
+			btn.disabled = true;
+
+			try {
+				const res = await fetch(`${SCRIPT_URL}?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`);
+				const data = await res.json();
+
+				if (data.status === 'success') {
+					user = data;
+					document.getElementById('login-section').classList.add('hidden');
+					document.getElementById('dashboard').classList.remove('hidden');
+					document.getElementById('u-info').innerHTML = `<h2 class="font-bold">${data.name}</h2><p class="text-[10px] opacity-70">${data.job}</p>`;
+					
+					if (data.job === "System Manager") {
+						document.getElementById('admin-panel').classList.remove('hidden');
+						loadAdminRequests();
+					}
+					startGPS();
+				} else {
+					alert("بيانات الدخول غير صحيحة");
+					btn.disabled = false;
+					btn.innerText = "دخول النظام";
+				}
+			} catch (e) {
+				alert("خطأ في الاتصال: تأكد من تفعيل الإنترنت");
+				btn.disabled = false;
+				btn.innerText = "دخول النظام";
+			}
+		}
+
+		function startGPS() {
+			if (!navigator.geolocation) return alert("متصفحك لا يدعم الموقع");
+
+			navigator.geolocation.watchPosition(pos => {
+				const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+				myCoords = `${lat},${lng}`;
+				myDist = getDist(lat, lng, CAFE_LAT, CAFE_LNG);
+				
+				const msg = document.getElementById('status-msg'), core = document.getElementById('radar-core'), distTxt = document.getElementById('distance-text'), bar = document.getElementById('distance-bar');
+				distTxt.innerText = `${Math.round(myDist)} متر`;
+				document.getElementById('accuracy-text').innerText = `دقة الرصد: +/- ${Math.round(accuracy)} متر`;
+
+				if (myDist <= RADIUS) {
+					msg.innerText = "أنت في نطاق العمل ✅";
+					msg.className = "mb-4 p-4 rounded-2xl text-sm font-bold bg-green-100 text-green-700 border-green-200 border-2 shadow-inner";
+					core.className = "w-20 h-20 rounded-full bg-green-500 flex items-center justify-center shadow-lg active-radar";
+					bar.style.width = "100%"; bar.className = "h-full bg-green-500 transition-all duration-700";
+					toggleBtns(true);
+				} else {
+					msg.innerText = "أنت خارج نطاق العمل 📍";
+					msg.className = "mb-4 p-4 rounded-2xl text-sm font-bold bg-red-50 text-red-600 border-red-100 border-2";
+					core.className = "w-20 h-20 rounded-full bg-red-400 flex items-center justify-center shadow-lg";
+					let p = Math.max(5, 100 - (myDist/10)); bar.style.width = p + "%";
+					bar.className = "h-full bg-red-400 transition-all duration-700";
+					toggleBtns(false);
+				}
+			}, err => {
+				document.getElementById('status-msg').innerText = "خطأ: يرجى تفعيل الـ GPS في الهاتف ❌";
+			}, {enableHighAccuracy: true});
+		}
+
+		function toggleBtns(on) {
+			const btns = [document.getElementById('inBtn'), document.getElementById('outBtn')];
+			btns.forEach(b => {
+				b.disabled = !on;
+				b.classList.toggle('opacity-40', !on);
+				b.classList.toggle('cursor-not-allowed', !on);
+			});
+		}
+
+		async function record(type) {
+			if(!confirm(`تأكيد تسجيل ${type}؟`)) return;
+			try {
+				await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({
+					action:'attendance', name: user.name, type: type, location: 'Mind Break', distance: Math.round(myDist), coords: myCoords
+				})});
+				alert("تم تسجيل البصمة بنجاح");
+			} catch(e) { alert("حدث خطأ أثناء التسجيل"); }
+		}
+
+		async function compressImg(file) {
+			return new Promise(res => {
+				const r = new FileReader(); r.readAsDataURL(file);
+				r.onload = e => {
+					const img = new Image(); img.src = e.target.result;
+					img.onload = () => {
+						const canvas = document.createElement('canvas');
+						const s = 800/img.width; canvas.width = 800; canvas.height = img.height*s;
+						canvas.getContext('2d').drawImage(img,0,0,800,canvas.height);
+						res(canvas.toDataURL('image/jpeg', 0.6));
+					}
+				}
+			});
+		}
+
+		async function sendRequest() {
+			const b = document.getElementById('reqBtn'), f = document.getElementById('fileInput'), d = document.getElementById('reqDetails').value;
+			if(!d) return alert("يرجى كتابة التفاصيل");
+			b.innerText = "جاري الرفع..."; b.disabled = true;
+			let fData = f.files[0] ? await compressImg(f.files[0]) : null;
+			try {
+				await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({
+					action:'submit_request', name:user.name, type:document.getElementById('reqType').value, details:d, fileData:fData
+				})});
+				alert("تم إرسال الطلب بنجاح"); location.reload();
+			} catch(e) { alert("حدث خطأ"); b.disabled = false; b.innerText = "إرسال للمدير"; }
+		}
+
+		async function loadAdminRequests() {
+			try {
+				const res = await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({action:'get_requests'})});
+				const data = await res.json();
+				document.getElementById('admin-table').innerHTML = data.map(r => `
+					<tr class="border-b"><td class="p-2 font-bold">${r.name}</td>
+					<td class="p-2 text-[10px]">${r.type}<br>${r.file!=="لا يوجد مرفق"?`<a href="${r.file}" target="_blank" class="text-blue-500 underline font-bold">المرفق ↗</a>`:'--'}</td>
+					<td class="p-2 flex flex-col gap-1">
+						<button onclick="updateStatus(${r.id},'مقبول')" class="bg-green-500 text-white text-[10px] py-1 rounded shadow">قبول</button>
+						<button onclick="updateStatus(${r.id},'مرفوض')" class="bg-red-500 text-white text-[10px] py-1 rounded shadow">رفض</button>
+					</td></tr>`).reverse().join('');
+			} catch(e) { console.error("Admin Load Error"); }
+		}
+
+		async function updateStatus(id, s) {
+			await fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify({action:'update_status', id, newStatus:s})});
+			alert("تم تحديث حالة الطلب"); loadAdminRequests();
+		}
+
+		function openExternalMap() { if(myCoords) window.open(`https://www.google.com/maps?q=${myCoords}`, '_blank'); }
+		function getDist(la1, lo1, la2, lo2) {
+			const R = 6371e3; const dLa = (la2-la1)*Math.PI/180; const dLo = (lo2-lo1)*Math.PI/180;
+			const a = Math.sin(dLa/2)**2 + Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;
+			return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		}
+	</script>
+</body>
+</html>
